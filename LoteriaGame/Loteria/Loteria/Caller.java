@@ -1,14 +1,20 @@
 package Loteria;
 
 public class Caller {
-    private final DeckOfCards deck;
+    private final DeckOfCards<LoteriaCard> deck;
 
-    public Caller(DeckOfCards deck) {
+    public Caller(DeckOfCards<LoteriaCard> deck) {
         this.deck = deck;
     }// End of 'Caller' Constructor.
 
-    public Card callNext() {
-        return this.deck.draw();
+    public LoteriaCard callNext() {
+        if(!this.deck.hasNext()) {
+            System.out.println("No more cards left.");
+            return null;
+        }
+        LoteriaCard next = this.deck.draw();
+        System.out.println("Caller shouts: " + next);
+        return next;
     }// End of 'callNext'.
 
     public void reshuffle() {

@@ -1,36 +1,30 @@
 package Loteria;
 import java.util.*;
 
-public class DeckOfCards {
-    private final List<Card> cards = new ArrayList<>();
-    private int index = 0;
+public class DeckOfCards<T extends Enum<T>> {
+    private final List<T> deckList;
+    private int index;
 
-    public DeckOfCards() {
-        buildDeck();
-        shuffle();
+    public DeckOfCards(Class<T> enumType) {
+        this.deckList = new ArrayList<>(EnumSet.allOf(enumType));
+        this.index = 0;
+        this.shuffle();
     }// End of 'DeckOfCards' Constructor.
 
     public void shuffle() {
-        Collections.shuffle(cards);
+        Collections.shuffle(this.deckList);
         this.index = 0;
     }// End of 'shuffle'.
 
-    private void buildDeck() {
-        cards.clear();
-        cards.add(new Card(1, "Storm Trooper", null));
-        // ...
-        // cards.add(new Card(54, , ))
-    }// End of 'buildDeck'.
-
-    public Card draw() {
+    public T draw() {
         if(!hasNext()) {
             return null;
         }
-        return cards.get(index++);
+        return this.deckList.get(this.index++);
     }// End of 'draw'.
 
     public boolean hasNext() {
-        return this.index < cards.size();
+        return this.index < this.deckList.size();
     }// End of 'hasNext'.
     
 }// End of 'DeckOfCards' Class.

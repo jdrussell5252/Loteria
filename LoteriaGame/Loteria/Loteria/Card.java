@@ -1,7 +1,7 @@
 package Loteria;
 
 public class Card {
-    private final int id;
+    /*private final int id;
     private final String name;
     private final String imagePath;
 
@@ -22,6 +22,6 @@ public class Card {
     public String getImagePath() {
         return this.imagePath;
     }// End of 'getImagePath'.
-
+*/
     
 }// End of 'Card' Class.
