@@ -38,4 +38,16 @@ public class LoteriaTabla {
         }
         return false;
     }// End of 'markCard'.
+
+    public LoteriaCard getCard(int row, int col) {
+        return grid[row][col];
+    }// End of 'getCard'.
+
+    public boolean isMarked(int row, int col) {
+        return marked[row][col];
+    }// End of 'isMarked'.
+
+    public int getSize() {
+        return n;
+    }// End of 'getSize'.
 }
