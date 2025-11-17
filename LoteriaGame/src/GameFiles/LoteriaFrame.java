@@ -17,7 +17,10 @@ import javax.imageio.ImageIO;
 import java.io.File;
 
 public class LoteriaFrame extends BorderPane {
-    
+
+    private final Controller controller = new Controller();
+    private Label currentCardLabel;
+
     public LoteriaFrame() {
         buildFrame();
     }
@@ -47,7 +50,7 @@ public class LoteriaFrame extends BorderPane {
         Label titleLabel = new Label("🎲 Lotería Game 🎲");
         titleLabel.setStyle("-fx-font-size: 32px; -fx-font-weight: bold;");
         
-        Label currentCardLabel = new Label("Click 'Call Card' to start");
+        currentCardLabel = new Label("Click 'Call Card' to start");
         currentCardLabel.setStyle("-fx-font-size: 18px; -fx-padding: 10;");
         
         topSection.getChildren().addAll(titleLabel, currentCardLabel);
@@ -168,19 +171,27 @@ public class LoteriaFrame extends BorderPane {
         HBox bottomSection = new HBox(20);
         bottomSection.setAlignment(Pos.CENTER);
         bottomSection.setPadding(new Insets(15));
-        
+
         Button callCardButton = new Button("Call Card");
         callCardButton.setStyle("-fx-font-size: 16px; -fx-padding: 10 30;");
         callCardButton.setOnAction(e -> {
             System.out.println("Call Card clicked!");
+            LoteriaCard card = controller.nextCard();
+            if (card != null) {
+                currentCardLabel.setText("Called: " + card.getName());
+            } else {
+                currentCardLabel.setText("No more cards!");
+            }
         });
-        
+
         Button restartButton = new Button("Restart Game");
         restartButton.setStyle("-fx-font-size: 16px; -fx-padding: 10 30;");
         restartButton.setOnAction(e -> {
             System.out.println("Restart clicked!");
+            controller.startGame();
+            currentCardLabel.setText("Click 'Call Card' to start");
         });
-        
+
         bottomSection.getChildren().addAll(callCardButton, restartButton);
         return bottomSection;
     }
