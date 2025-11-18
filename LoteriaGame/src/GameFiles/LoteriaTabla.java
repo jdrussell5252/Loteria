@@ -50,4 +50,62 @@ public class LoteriaTabla {
     public int getSize() {
         return n;
     }// End of 'getSize'.
-}
+
+    public boolean checkWin() {
+        return checkRows() || checkColumns() || checkDiagonals() || checkFourCorners();
+    }// End of 'checkWin'.
+
+    private boolean checkRows() {
+        for(int i = 0; i < n; i++) {
+            boolean rowComplete = true;
+            for(int j = 0; j < n; j++) {
+                if(!marked[i][j]) {
+                    rowComplete = false;
+                    break;
+                }
+            }
+            if(rowComplete) return true;
+        }
+        return false;
+    }// End of 'checkRows'.
+
+    private boolean checkColumns() {
+        for(int j = 0; j < n; j++) {
+            boolean colComplete = true;
+            for(int i = 0; i < n; i++) {
+                if(!marked[i][j]) {
+                    colComplete = false;
+                    break;
+                }
+            }
+            if(colComplete) return true;
+        }
+        return false;
+    }// End of 'checkColumns'.
+
+    private boolean checkDiagonals() {
+        // Check top-left to bottom-right diagonal
+        boolean diagonal1 = true;
+        for(int i = 0; i < n; i++) {
+            if(!marked[i][i]) {
+                diagonal1 = false;
+                break;
+            }
+        }
+        if(diagonal1) return true;
+
+        // Check top-right to bottom-left diagonal
+        boolean diagonal2 = true;
+        for(int i = 0; i < n; i++) {
+            if(!marked[i][n - 1 - i]) {
+                diagonal2 = false;
+                break;
+            }
+        }
+        return diagonal2;
+    }// End of 'checkDiagonals'.
+
+    private boolean checkFourCorners() {
+        return marked[0][0] && marked[0][n-1] && marked[n-1][0] && marked[n-1][n-1];
+    }// End of 'checkFourCorners'.
+}// End of 'LoteriaTabla' Class.
