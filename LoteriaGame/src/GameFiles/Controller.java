@@ -38,16 +38,11 @@ public class Controller {
         return this.game;
     }
 
-    // Mark a card for a specific player
-    public boolean markCardForPlayer(int playerIndex, LoteriaCard card){
-        Player player = game.getPlayer(playerIndex);
-        if(player != null && card != null) {
-            // Only allow marking if the card was the last one called
-            if(card.equals(game.getLastCalledCard())) {
-                return player.markCard(card);
-            }
+    // Auto-mark the called card for all players
+    public void autoMarkCalledCard(LoteriaCard card) {
+        for(Player player : game.getPlayers()) {
+            player.markCard(card);
         }
-        return false;
     }
 
     // Check if a player has won when they call "Loteria!"

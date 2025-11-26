@@ -26,5 +26,9 @@ public class DeckOfCards<T extends Enum<T>> {
     public boolean hasNext() {
         return this.index < this.deckList.size();
     }// End of 'hasNext'.
+
+    public void reshuffle() {
+        shuffle();
+    }// End of 'reshuffle'.
     
 }// End of 'DeckOfCards' Class.

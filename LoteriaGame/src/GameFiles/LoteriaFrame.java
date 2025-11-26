@@ -26,6 +26,7 @@ public class LoteriaFrame extends BorderPane {
     private Label currentCardLabel;
     private VBox player1Section;
     private VBox player2Section;
+    private HBox centerSection;
 
     public LoteriaFrame() {
         buildFrame();
@@ -41,7 +42,7 @@ public class LoteriaFrame extends BorderPane {
         this.setTop(topSection);
 
         // Center: The two player boards will go here
-        HBox centerSection = createCenterSection();
+        centerSection = createCenterSection();
         this.setCenter(centerSection);
         
         // Bottom: Buttons
@@ -184,34 +185,10 @@ public class LoteriaFrame extends BorderPane {
                 // Add card and marker to stack
                 cardStack.getChildren().addAll(cardBox, marker);
                 
-                // Make card clickable
-                cardStack.setOnMouseClicked(e -> {
-                    if(controller.getGame().isGameActive()) {
-                        // Try to mark the card for this player
-                        boolean marked = controller.markCardForPlayer(playerIndex, card);
-                        if(marked) {
-                            marker.setVisible(true);
-                            System.out.println(player.getName() + " marked " + card.getName());
-                        } else {
-                            System.out.println("Cannot mark - card not called yet or already marked");
-                        }
-                    }
-                });
-                
-                // Add hover effect
-                cardStack.setOnMouseEntered(e -> {
-                    if(controller.getGame().isGameActive()) {
-                        cardBox.setStyle("-fx-border-color: gold; -fx-border-width: 3; " +
-                                       "-fx-min-width: 80; -fx-min-height: 80; " +
-                                       "-fx-background-color: white; -fx-cursor: hand;");
-                    }
-                });
-                
-                cardStack.setOnMouseExited(e -> {
-                    cardBox.setStyle("-fx-border-color: black; -fx-border-width: 2; " +
-                                   "-fx-min-width: 80; -fx-min-height: 80; " +
-                                   "-fx-background-color: white;");
-                });
+                // Update marker visibility based on card marked status
+                if(tabla.isMarked(r, c)) {
+                    marker.setVisible(true);
+                }
                 
                 // Add to grid at row, col position
                 tablaGrid.add(cardStack, col, row);
@@ -266,6 +243,9 @@ public class LoteriaFrame extends BorderPane {
                 LoteriaCard card = controller.nextCard();
                 if (card != null) {
                     currentCardLabel.setText("Called: " + card.getName());
+                    // Auto-mark the card for all players and refresh display
+                    controller.autoMarkCalledCard(card);
+                    refreshPlayerBoards();
                 } else {
                     currentCardLabel.setText("No more cards!");
                 }
@@ -288,7 +268,13 @@ public class LoteriaFrame extends BorderPane {
         currentCardLabel.setText("Click 'Call Card' to start");
         
         // Rebuild the center section with new tablas
-        HBox centerSection = createCenterSection();
+        centerSection = createCenterSection();
+        this.setCenter(centerSection);
+    }
+    
+    // Method to refresh player boards when cards are marked
+    private void refreshPlayerBoards() {
+        centerSection = createCenterSection();
         this.setCenter(centerSection);
     }
 }// End of 'LoteriaFrame' Class.
