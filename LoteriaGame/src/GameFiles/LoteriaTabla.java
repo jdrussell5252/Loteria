@@ -108,4 +108,20 @@ public class LoteriaTabla {
     private boolean checkFourCorners() {
         return marked[0][0] && marked[0][n-1] && marked[n-1][0] && marked[n-1][n-1];
     }// End of 'checkFourCorners'.
+    
+    public void reset() {
+        // Re-shuffle and assign new cards
+        LoteriaCard[] allCards = LoteriaCard.values();
+        List<LoteriaCard> cardList = new ArrayList<>(Arrays.asList(allCards));
+        Collections.shuffle(cardList);
+        List<LoteriaCard> selectedCards = cardList.subList(0, n * n);
+        
+        // Reset grid and marks
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
+                grid[i][j] = selectedCards.get(i * n + j);
+                marked[i][j] = false;
+            }
+        }
+    }// End of 'reset'.
 }// End of 'LoteriaTabla' Class.

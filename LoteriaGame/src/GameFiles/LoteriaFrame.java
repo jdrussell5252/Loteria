@@ -13,7 +13,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Circle;
 import javafx.scene.layout.StackPane;
 import javafx.embed.swing.SwingFXUtils;
@@ -24,8 +23,6 @@ public class LoteriaFrame extends BorderPane {
 
     private final Controller controller = new Controller();
     private Label currentCardLabel;
-    private VBox player1Section;
-    private VBox player2Section;
     private HBox centerSection;
 
     public LoteriaFrame() {
@@ -71,10 +68,10 @@ public class LoteriaFrame extends BorderPane {
         centerSection.setPadding(new Insets(20));
         
         // Left side - Player 1 with tabla
-        player1Section = createPlayerSection(0);
+        VBox player1Section = createPlayerSection(0);
         
         // Right side - Player 2 with tabla
-        player2Section = createPlayerSection(1);
+        VBox player2Section = createPlayerSection(1);
         
         centerSection.getChildren().addAll(player1Section, player2Section);
         return centerSection;
@@ -102,8 +99,6 @@ public class LoteriaFrame extends BorderPane {
         // Fill the grid with cards from the tabla
         for (int row = 0; row < 4; row++) {
             for (int col = 0; col < 4; col++) {
-                final int r = row;
-                final int c = col;
                 LoteriaCard card = tabla.getCard(row, col);
                 
                 // Create a StackPane to overlay marker on card
@@ -135,44 +130,23 @@ public class LoteriaFrame extends BorderPane {
                             
                             cardBox.getChildren().add(imageView);
                         } else {
-                            // Fallback to colored rectangle
-                            VBox cardContent = new VBox(5);
-                            cardContent.setAlignment(Pos.CENTER);
-                            Rectangle rect = new Rectangle(70, 70);
-                            rect.setFill(Color.LIGHTCORAL);
-                            rect.setStroke(Color.BLACK);
-                            rect.setStrokeWidth(1);
+                            // Fallback to text label only
                             Label nameLabel = new Label(card.getName());
                             nameLabel.setStyle("-fx-font-size: 10px;");
-                            cardContent.getChildren().addAll(rect, nameLabel);
-                            cardBox.getChildren().add(cardContent);
+                            cardBox.getChildren().add(nameLabel);
                         }
                     } catch (Exception e) {
                         System.out.println("Error loading image for " + card.getName() + ": " + e.getMessage());
-                        // Fallback to colored rectangle
-                        VBox cardContent = new VBox(5);
-                        cardContent.setAlignment(Pos.CENTER);
-                        Rectangle rect = new Rectangle(70, 70);
-                        rect.setFill(Color.LIGHTCORAL);
-                        rect.setStroke(Color.BLACK);
-                        rect.setStrokeWidth(1);
+                        // Fallback to text label only
                         Label nameLabel = new Label(card.getName());
                         nameLabel.setStyle("-fx-font-size: 10px;");
-                        cardContent.getChildren().addAll(rect, nameLabel);
-                        cardBox.getChildren().add(cardContent);
+                        cardBox.getChildren().add(nameLabel);
                     }
                 } else {
-                    // No image path - use colored rectangle
-                    VBox cardContent = new VBox(5);
-                    cardContent.setAlignment(Pos.CENTER);
-                    Rectangle rect = new Rectangle(70, 70);
-                    rect.setFill(Color.LIGHTCORAL);
-                    rect.setStroke(Color.BLACK);
-                    rect.setStrokeWidth(1);
+                    // No image path - use text label only
                     Label nameLabel = new Label(card.getName());
                     nameLabel.setStyle("-fx-font-size: 10px;");
-                    cardContent.getChildren().addAll(rect, nameLabel);
-                    cardBox.getChildren().add(cardContent);
+                    cardBox.getChildren().add(nameLabel);
                 }
                 
                 // Create marker (initially invisible)
@@ -186,7 +160,7 @@ public class LoteriaFrame extends BorderPane {
                 cardStack.getChildren().addAll(cardBox, marker);
                 
                 // Update marker visibility based on card marked status
-                if(tabla.isMarked(r, c)) {
+                if(tabla.isMarked(row, col)) {
                     marker.setVisible(true);
                 }
                 
@@ -195,22 +169,7 @@ public class LoteriaFrame extends BorderPane {
             }
         }
         
-        // Add Loteria button for this player
-        Button loteriaButton = new Button("¡LOTERÍA!");
-        loteriaButton.setStyle("-fx-font-size: 16px; -fx-padding: 10 20; " +
-                              "-fx-background-color: #FFD700; -fx-font-weight: bold;");
-        loteriaButton.setOnAction(e -> {
-            if(controller.getGame().isGameActive()) {
-                boolean won = controller.handleLoteria(playerIndex);
-                if(won) {
-                    showWinnerAlert(player.getName());
-                } else {
-                    showFalseAlarmAlert(player.getName());
-                }
-            }
-        });
-        
-        section.getChildren().addAll(playerLabel, tablaGrid, loteriaButton);
+        section.getChildren().addAll(playerLabel, tablaGrid);
         return section;
     }
     
@@ -219,14 +178,6 @@ public class LoteriaFrame extends BorderPane {
         alert.setTitle("¡LOTERÍA!");
         alert.setHeaderText("🎉 " + playerName + " WINS! 🎉");
         alert.setContentText("Congratulations! " + playerName + " has won the game!");
-        alert.showAndWait();
-    }
-    
-    private void showFalseAlarmAlert(String playerName) {
-        Alert alert = new Alert(AlertType.WARNING);
-        alert.setTitle("False Alarm");
-        alert.setHeaderText("Not quite...");
-        alert.setContentText(playerName + " doesn't have a winning pattern yet. Keep playing!");
         alert.showAndWait();
     }
     
@@ -246,6 +197,9 @@ public class LoteriaFrame extends BorderPane {
                     // Auto-mark the card for all players and refresh display
                     controller.autoMarkCalledCard(card);
                     refreshPlayerBoards();
+                    
+                    // Check for automatic win after marking
+                    checkForWinner();
                 } else {
                     currentCardLabel.setText("No more cards!");
                 }
@@ -264,8 +218,11 @@ public class LoteriaFrame extends BorderPane {
     }
     
     private void restartGame() {
-        controller.startGame();
+        controller.resetGame();
         currentCardLabel.setText("Click 'Call Card' to start");
+        
+        // Clear the old center section first
+        this.getChildren().remove(centerSection);
         
         // Rebuild the center section with new tablas
         centerSection = createCenterSection();
@@ -274,8 +231,24 @@ public class LoteriaFrame extends BorderPane {
     
     // Method to refresh player boards when cards are marked
     private void refreshPlayerBoards() {
+        // Clear the old center section first
+        this.getChildren().remove(centerSection);
+        
+        // Rebuild the center section
         centerSection = createCenterSection();
         this.setCenter(centerSection);
+    }
+    
+    // Check if any player has won automatically
+    private void checkForWinner() {
+        for(int i = 0; i < controller.getGame().getPlayers().size(); i++) {
+            Player player = controller.getGame().getPlayer(i);
+            if(player != null && player.hasWon()) {
+                controller.getGame().endGame();
+                showWinnerAlert(player.getName());
+                break;
+            }
+        }
     }
 }// End of 'LoteriaFrame' Class.
 

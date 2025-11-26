@@ -57,5 +57,20 @@ public class Controller {
         System.out.println("False alarm - no win pattern!");
         return false;
     }
+    
+    // Reset the entire game - shuffle deck, reset all player tablas, restart game
+    public void resetGame() {
+        // Reshuffle the deck
+        caller.reshuffle();
+        
+        // Reset all player tablas (new cards, clear marks)
+        for(Player player : game.getPlayers()) {
+            player.resetTabla();
+        }
+        
+        // Restart the game
+        game.startGame();
+        System.out.println("Game Reset - New tablas generated and deck reshuffled");
+    }
 
 }// End of 'Controller' Class.

@@ -24,4 +24,8 @@ public class Player {
     public boolean hasWon() {
         return this.tabla.checkWin();
     }// End of 'hasWon'.
+    
+    public void resetTabla() {
+        this.tabla.reset();
+    }// End of 'resetTabla'.
 }// End of 'Player' Class.
